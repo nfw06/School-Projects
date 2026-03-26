@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8">
+    <meta name = "author" content = "Ferrari William Njoki">
+    <meta name = "viewport" content = "width: device-width, initial-scale = 1">
+    <link rel = "stylesheet" href = "../Style/tutte_opere.css">
+    <title>Tutte le Opere</title>
+  </head>
+
+  <body>
+    <h1>Tutte le Opere</h1>
+
+    <a href="index.html">← Home</a>
+
+    <br><br>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Immagine</th>
+          <th>Titolo</th>
+          <th>Artista</th>
+          <th>Anno</th>
+          <th>Tecnica</th>
+          <th>Museo</th>
+        </tr>
+      </thead>
+      <tbody id="corpo-tabella">
+      </tbody>
+    </table>
+
+    <script>
+      const SERVER = "http://localhost/php/arte_api/server";
+
+      async function carica_opere() {
+        const risposta = await fetch(`${SERVER}/quadri`);
+        const opere = await risposta.json();
+
+        const corpo = document.getElementById("corpo-tabella");
+        corpo.innerHTML = "";
+
+        opere.forEach(opera => {
+          const riga = document.createElement("tr");
+          riga.innerHTML = `
+            <td><img src="${opera.QQ_Url}" height="80"></td>
+            <td>${opera.QQ_TitoloQuadro}</td>
+            <td>${opera.AR_Nome}</td>
+            <td>${opera.QQ_AnnoEsecuzione}</td>
+            <td>${opera.QQ_Tecnica}</td>
+            <td>${opera.MM_Nome} - ${opera.MM_Citta}</td>
+          `;
+          corpo.appendChild(riga);
+        });
+      }
+
+      carica_opere();
+    </script>
+  </body>
+</html>

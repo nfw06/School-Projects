@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8">
+    <meta name = "author" content = "Ferrari William Njoki">
+    <meta name = "viewport" content = "width: device-width, initial-scale = 1">
+    <title>Nuovo Quadro</title>
+  </head>
+
+  <body>
+    <h1>Aggiungi Opera</h1>
+
+    <a href="javascript:history.back()">← Torna indietro</a>
+
+    <br><br>
+
+    <label for = "titolo">Titolo: </label> <input type="text" id="titolo" placeholder="Titolo"><br>
+    <label for = "anno">Anno: </label> <input type="number" id="anno" placeholder="Anno Esecuzione"><br>
+    <label for = "tecnica">Tecnica</label> <input type="text" id="tecnica" placeholder="Tecnica"><br>
+    <label for = "altezza">Altezza: </label> <input type="number" id="altezza" placeholder="Altezza (cm)"><br>
+    <label for = "larghezza">Larghezza: </label> <input type="number" id="larghezza" placeholder="Larghezza (cm)"><br>
+    <label for = "museo">Museo: </label> <input type="text" id="museo" placeholder="Codice Museo (es. M01)"><br>
+    <label for = "note">Note: </label> <input type="text" id="note" placeholder="Note"><br>
+    <label for = "url">Url: </label> <input type="text" id="url" placeholder="URL Immagine"><br>
+    <br>
+
+    <button onclick="crea_quadro()">Salva</button>
+
+    <p id="messaggio"></p>
+
+    <script>
+      const SERVER = "http://localhost/php/arte_api/server";
+
+      const params = new URLSearchParams(window.location.search);
+      const idArtista = params.get("id");
+
+      async function crea_quadro() {
+        const data = {
+          QQ_TitoloQuadro: document.getElementById("titolo").value,
+          QQ_CodiceArtista: idArtista,
+          QQ_AnnoEsecuzione: document.getElementById("anno").value,
+          QQ_Tecnica: document.getElementById("tecnica").value,
+          QQ_Altezza: document.getElementById("altezza").value,
+          QQ_Larghezza: document.getElementById("larghezza").value,
+          QQ_CodiceMuseo: document.getElementById("museo").value,
+          QQ_Note: document.getElementById("note").value,
+          QQ_Url: document.getElementById("url").value
+        };
+
+        const risposta = await fetch(`${SERVER}/quadri`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const risultato = await risposta.json();
+        document.getElementById("messaggio").textContent = risultato.messaggio || risultato.errore;
+      }
+    </script>
+  </body>
+</html>

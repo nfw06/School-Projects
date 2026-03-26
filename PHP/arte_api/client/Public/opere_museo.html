@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8">
+    <meta name = "author" content = "Ferrari William Njoki">
+    <meta name = "viewport" content = "width: device-width, initial-scale = 1">
+    <link rel = "stylesheet" href = "../Style/opere_museo.css">
+    <title>Opere per Museo</title>
+  </head>
+
+  <body>
+    <h1>Opere per Museo</h1>
+
+    <a href="index.html">← Home</a>
+
+    <br><br>
+
+    <select id="musei"></select>
+    <button onclick="carica_opere()">Mostra Opere</button>
+
+    <br><br>
+
+    <h2 id="titolo-museo"></h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Immagine</th>
+          <th>Titolo</th>
+          <th>Anno</th>
+          <th>Tecnica</th>
+        </tr>
+      </thead>
+      <tbody id="corpo-tabella"></tbody>
+    </table>
+
+    <script>
+      const SERVER = "http://localhost/php/arte_api/server";
+
+      async function carica_musei() {
+        const risposta = await fetch(`${SERVER}/musei`);
+        const musei = await risposta.json();
+
+        const select = document.getElementById("musei");
+        musei.forEach(museo => {
+          const option = document.createElement("option");
+          option.value = museo.MM_CodiceMuseo;
+          option.textContent = `${museo.MM_Nome} - ${museo.MM_Citta}`;
+          select.appendChild(option);
+        });
+      }
+
+      async function carica_opere() {
+        const id = document.getElementById("musei").value;
+
+        const risposta = await fetch(`${SERVER}/musei/${id}/quadri`);
+        const opere = await risposta.json();
+
+        const museo = document.getElementById("musei").selectedOptions[0].textContent;
+        document.getElementById("titolo-museo").textContent = museo;
+
+        const corpo = document.getElementById("corpo-tabella");
+        corpo.innerHTML = "";
+
+        opere.forEach(opera => {
+          const riga = document.createElement("tr");
+          riga.innerHTML = `
+            <td><img src="${opera.QQ_Url}" height="80"></td>
+            <td>${opera.QQ_TitoloQuadro}</td>
+            <td>${opera.QQ_AnnoEsecuzione}</td>
+            <td>${opera.QQ_Tecnica}</td>
+          `;
+          corpo.appendChild(riga);
+        });
+      }
+
+      carica_musei();
+    </script>
+  </body>
+</html>

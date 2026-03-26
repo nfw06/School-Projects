@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8">
+    <meta name = "author" content = "Ferrari William Njoki">
+    <meta name = "viewport" content = "width: device-width, initial-scale: 1.0">
+    <link rel = "stylesheet" href = "../Style/opere_artista.css">
+    <title>Opere Artista</title>
+  </head>
+
+  <body>
+    <h1 id="titolo-artista">Opere</h1>
+
+    <a href="artisti.html">← Torna alla lista</a>
+
+    <br><br>
+
+    <a id="link-nuovo-quadro" href="#">+ Aggiungi Opera</a>
+
+    <br><br>
+
+    <table id="tabella-opere">
+      <thead>
+        <tr>
+          <th>Immagine</th>
+          <th>Titolo</th>
+          <th>Anno</th>
+          <th>Tecnica</th>
+          <th>Museo</th>
+          <th>Città</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+      <tbody id="corpo-tabella">
+      </tbody>
+    </table>
+
+    <script>
+      const SERVER = "http://localhost/php/arte_api/server";
+
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+
+      // Imposta il link per aggiungere un'opera per questo artista
+      document.getElementById("link-nuovo-quadro").href = `nuovo_quadro.html?id=${id}`;
+
+      async function carica_opere() {
+        const risposta = await fetch(`${SERVER}/artisti/${id}`);
+        const artista = await risposta.json();
+        document.getElementById("titolo-artista").textContent = `Opere di ${artista.AR_Nome}`;
+
+        const rispostaOpere = await fetch(`${SERVER}/artisti/${id}/quadri`);
+        const opere = await rispostaOpere.json();
+
+        const corpo = document.getElementById("corpo-tabella");
+
+        opere.forEach(opera => {
+          const riga = document.createElement("tr");
+
+          riga.innerHTML = `
+            <td><img src="${opera.QQ_Url}"></td>
+            <td>${opera.QQ_TitoloQuadro}</td>
+            <td>${opera.QQ_AnnoEsecuzione}</td>
+            <td>${opera.QQ_Tecnica}</td>
+            <td>${opera.MM_Nome}</td>
+            <td>${opera.MM_Citta}</td>
+            <td>
+              <a href="modifica_quadro.html?titolo=${encodeURIComponent(opera.QQ_TitoloQuadro)}">Modifica</a>
+              <a href="#" onclick="elimina_opera('${opera.QQ_TitoloQuadro}')">Elimina</a>
+            </td>
+          `;
+
+          corpo.appendChild(riga);
+        });
+      }
+
+      async function elimina_opera(titolo) {
+        if (!confirm(`Eliminare "${titolo}"?`)) return;
+
+        const risposta = await fetch(`${SERVER}/quadri/${encodeURIComponent(titolo)}`, {
+          method: "DELETE"
+        });
+
+        const dati = await risposta.json();
+        alert(dati.messaggio || dati.errore);
+
+        document.getElementById("corpo-tabella").innerHTML = "";
+        carica_opere();
+      }
+
+      carica_opere();
+    </script>
+  </body>
+</html>

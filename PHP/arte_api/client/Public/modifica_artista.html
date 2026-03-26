@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8">
+    <meta name = "author" content = "Ferrari William Njoki">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifica Artista</title>
+  </head>
+
+  <body>
+    <h1>Modifica Artista</h1>
+
+    <a href="artisti.html">← Torna alla lista</a>
+
+    <br><br>
+
+    <label for = "nome">Nome: </label> <input type="text" id="nome" placeholder="Nome"><br>
+    <label for = "alias">Alias: </label> <input type="text" id="alias" placeholder="Alias"><br>
+    <label for = "nascita">Anno di Nascita: </label> <input type="number" id="nascita" placeholder="Anno Nascita"><br>
+    <label for = "morte">Anno di Morte: </label> <input type="number" id="morte" placeholder="Anno Morte"><br> 
+    
+    <br>
+
+    <button onclick="modifica_artista()">Salva</button>
+
+    <p id="messaggio"></p>
+
+    <script>
+      const SERVER = "http://localhost/php/arte_api/server";
+
+      // Legge l'id dall'URL: modifica_artista.html?id=A110
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+
+      let nascita = 100;
+      let morte = 0;
+      // Carica i dati esistenti nei campi
+      async function carica_artista() {
+        const risposta = await fetch(`${SERVER}/artisti/${id}`);
+        const artista = await risposta.json();
+
+        document.getElementById("nome").value = artista.AR_Nome;
+        document.getElementById("alias").value = artista.AR_Alias;
+        document.getElementById("nascita").value = artista.AR_DataNascita;
+        document.getElementById("morte").value = artista.AR_DataMorte;
+      }
+
+      async function modifica_artista() {
+        const data = {
+          AR_Nome: document.getElementById("nome").value,
+          AR_Alias: document.getElementById("alias").value,
+          AR_DataNascita: document.getElementById("nascita").value,
+          AR_DataMorte: document.getElementById("morte").value
+        };
+
+        const risposta = await fetch(`${SERVER}/artisti/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const risultato = await risposta.json();
+        document.getElementById("messaggio").textContent = risultato.messaggio || risultato.errore;
+      }
+
+      carica_artista();
+    </script>
+  </body>
+</html>

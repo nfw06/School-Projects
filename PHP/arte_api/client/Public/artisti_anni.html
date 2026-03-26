@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8">
+    <meta name = "author" content = "Ferrari William Njoki">
+    <meta name = "viewport" content = "width: device-width, initial-scale = 1">
+    <link rel = "stylesheet" href = "../Style/artisti_anni.css">
+    <title>Artisti per Anni</title>
+  </head>
+
+  <body>
+    <h1>Artisti Vissuti tra due Anni</h1>
+
+    <a href="index.html">← Home</a>
+
+    <br><br>
+
+    <input type="number" id="dal" placeholder="Anno dal">
+    <input type="number" id="al" placeholder="Anno al">
+    <button onclick="cerca()">Cerca</button>
+
+    <br><br>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Codice</th>
+          <th>Nome</th>
+          <th>Alias</th>
+          <th>Nascita</th>
+          <th>Morte</th>
+        </tr>
+      </thead>
+      <tbody id="corpo-tabella"></tbody>
+    </table>
+
+    <script>
+      const SERVER = "http://localhost/php/arte_api/server";
+
+      async function cerca() {
+        const dal = document.getElementById("dal").value;
+        const al = document.getElementById("al").value;
+
+        const risposta = await fetch(`${SERVER}/artisti?dal=${dal}&al=${al}`);
+        const artisti = await risposta.json();
+
+        const corpo = document.getElementById("corpo-tabella");
+        corpo.innerHTML = "";
+
+        artisti.forEach(artista => {
+          const riga = document.createElement("tr");
+          riga.innerHTML = `
+            <td>${artista.AR_CodiceArtista}</td>
+            <td>${artista.AR_Nome}</td>
+            <td>${artista.AR_Alias}</td>
+            <td>${artista.AR_DataNascita}</td>
+            <td>${artista.AR_DataMorte}</td>
+          `;
+          corpo.appendChild(riga);
+        });
+      }
+    </script>
+  </body>
+</html>
